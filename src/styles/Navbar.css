@@ -1,0 +1,74 @@
+@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;700&display=swap');
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 32px;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.navbar-link {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #000;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.navbar-link:hover {
+  color: #027A20;
+}
+
+.navbar-caret {
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: #000;
+  cursor: pointer;
+}
+
+.navbar-brand {
+  flex: 1;
+  text-align: center;
+}
+
+.navbar-title {
+  font-family: 'Great Vibes', cursive;
+  font-size: 42px;
+  font-weight: 400;
+  color: #000;
+  line-height: 1;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-signup {
+  background: #141313;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  border: none;
+  padding: 8px 24px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.navbar-signup:hover {
+  background: #333;
+}

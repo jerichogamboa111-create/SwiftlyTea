@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Irish+Grover&family=Inter:wght@400;700&display=swap');
+
+.drink-menu {
+  position: relative;
+  overflow: hidden;
+  padding: 24px 0 32px;
+}
+
+.drink-menu-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.18;
+  pointer-events: none;
+}
+
+.drink-menu-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.drink-menu-content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.menu-col {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.menu-section {
+  background: rgba(255,255,255,0.82);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.section-header {
+  background: rgba(217, 217, 217, 0.6);
+  padding: 6px 12px;
+}
+
+.section-title {
+  font-family: 'Irish Grover', cursive;
+  font-size: 17px;
+  font-weight: 400;
+  color: #027A20;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.coffee-free {
+  font-size: 13px;
+  color: #027A20;
+}
+
+.section-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 8px;
+  padding: 4px 12px 8px;
+}
+
+.section-body-single {
+  padding: 4px 12px 8px;
+}
+
+.section-left,
+.section-right {
+  display: flex;
+  flex-direction: column;
+}
+
+.section-col-header {
+  display: flex;
+  justify-content: space-between;
+  padding: 2px 0;
+}
+
+.section-col-header-single {
+  display: flex;
+  justify-content: flex-end;
+  padding: 2px 0;
+}
+
+.col-label {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #000;
+}
+
+.col-label-single {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: #000;
+}
+
+.menu-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.menu-item-row:last-child {
+  border-bottom: none;
+}
+
+.item-name {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #000;
+  flex: 1;
+}
+
+.item-prices {
+  display: flex;
+  gap: 12px;
+  min-width: 60px;
+  justify-content: flex-end;
+}
+
+.item-prices span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(2,122,32,0.75);
+  border-radius: 3px;
+  padding: 1px 5px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.item-prices-single {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 40px;
+}
+
+.item-prices-single span {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(2,122,32,0.75);
+  border-radius: 3px;
+  padding: 1px 5px;
+  min-width: 24px;
+  text-align: center;
+}
+
+/* Add-ons box */
+.addons-box {
+  background: rgba(217, 217, 217, 0.5);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 6px;
+}
+
+.addons-title {
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 14px;
+  color: #000;
+  margin-bottom: 8px;
+}
+
+.addons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+}
+
+.addons-col {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.addon-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  color: #000;
+  padding: 2px 0;
+}
+
+/* Tea cup decoration */
+.tea-cup-img {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.tea-cup-img img {
+  width: 100px;
+  height: auto;
+  opacity: 0.85;
+}

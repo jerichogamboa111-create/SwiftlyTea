@@ -1,0 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Modak&family=Irish+Grover&display=swap');
+
+.hero {
+  position: relative;
+  overflow: hidden;
+  min-height: 520px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 32px;
+  padding: 40px 32px 0;
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.hero-drink-img {
+  flex-shrink: 0;
+}
+
+.hero-drink-img img {
+  width: 220px;
+  height: auto;
+  display: block;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.2));
+}
+
+.hero-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 16px;
+}
+
+.hero-headline {
+  font-family: 'Modak', cursive;
+  font-size: 72px;
+  font-weight: 400;
+  color: #027A20;
+  line-height: 1.1;
+  margin: 0;
+  -webkit-text-stroke: 1px #1A0202;
+  text-stroke: 1px #1A0202;
+}
+
+.hero-tagline {
+  font-family: 'Irish Grover', cursive;
+  font-size: 22px;
+  font-weight: 400;
+  color: #027A20;
+  margin: 8px 0 0;
+}
+
+.hero-menu-title {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  padding: 16px 0 8px;
+}
+
+.menu-word {
+  font-family: 'Modak', cursive;
+  font-size: 96px;
+  font-weight: 400;
+  color: #027A20;
+  line-height: 1;
+}

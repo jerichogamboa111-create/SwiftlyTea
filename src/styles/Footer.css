@@ -1,0 +1,110 @@
+@import url('https://fonts.googleapis.com/css2?family=Goblin+One&family=Istok+Web:wght@700&display=swap');
+
+.footer {
+  position: relative;
+  background: #fff;
+  padding: 32px 16px 16px;
+  overflow: hidden;
+}
+
+.footer-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 960px;
+  margin: 0 auto;
+  gap: 32px;
+}
+
+.footer-text {
+  flex: 1;
+}
+
+.footer-accept {
+  font-family: 'Istok Web', 'Inter', sans-serif;
+  font-size: 36px;
+  line-height: 1.35;
+  color: #000;
+  margin: 0 0 20px;
+}
+
+.footer-accept em {
+  font-style: italic;
+  font-size: 32px;
+}
+
+.footer-accept strong {
+  font-weight: 700;
+  display: block;
+}
+
+.footer-address-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.footer-pin {
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.footer-address {
+  font-family: 'Goblin One', cursive;
+  font-size: 22px;
+  font-weight: 400;
+  color: #000;
+  line-height: 1.4;
+}
+
+.footer-social {
+  margin-top: 8px;
+}
+
+.footer-social-img {
+  width: 240px;
+  height: auto;
+  display: block;
+}
+
+.footer-qr {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+.footer-qr-img {
+  width: 160px;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+}
+
+.footer-scan {
+  background: #7D7D7D;
+  width: 100%;
+  text-align: center;
+  padding: 8px 16px;
+}
+
+.footer-scan span {
+  font-family: 'Goblin One', cursive;
+  font-size: 22px;
+  font-weight: 400;
+  color: #000;
+}
+
+.footer-delivery-img {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 0;
+}
+
+.footer-delivery {
+  width: 260px;
+  height: auto;
+  opacity: 0.85;
+}
