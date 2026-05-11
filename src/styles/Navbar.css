@@ -1,74 +1,140 @@
-@import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600&family=DM+Sans:wght@400;500;600&display=swap');
 
 .navbar {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  background: rgba(255,252,248,0.95);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #e8e0d5;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 32px;
-  background: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  padding: 0 32px;
+  height: 68px;
+  gap: 24px;
+}
+
+.navbar-brand {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .navbar-links {
   display: flex;
+  gap: 28px;
   align-items: center;
-  gap: 24px;
+  flex: 1;
+  margin-left: 40px;
 }
 
-.navbar-link {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 16px;
-  color: #000;
+.navbar-links a {
   text-decoration: none;
+  color: #555;
+  font-weight: 500;
+  font-size: 0.92rem;
   transition: color 0.2s;
 }
+.navbar-links a:hover { color: #1a1a1a; }
 
-.navbar-link:hover {
-  color: #027A20;
-}
-
-.navbar-caret {
-  font-family: 'Inter', sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  color: #000;
-  cursor: pointer;
-}
-
-.navbar-brand {
-  flex: 1;
-  text-align: center;
-}
-
-.navbar-title {
-  font-family: 'Great Vibes', cursive;
-  font-size: 42px;
-  font-weight: 400;
-  color: #000;
-  line-height: 1;
+.admin-link {
+  color: #c2185b !important;
+  font-weight: 700 !important;
 }
 
 .navbar-actions {
   display: flex;
   align-items: center;
+  gap: 14px;
+  white-space: nowrap;
 }
 
-.navbar-signup {
-  background: #141313;
+.cart-btn {
+  position: relative;
+  font-size: 1.3rem;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -10px;
+  background: #c2185b;
   color: #fff;
-  font-family: 'Inter', sans-serif;
-  font-weight: 300;
-  font-size: 16px;
-  border: none;
-  padding: 8px 24px;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-username {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-badge {
+  background: #fff3e0;
+  color: #e65100;
+  font-size: 0.65rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.btn-logout {
+  padding: 7px 16px;
+  background: transparent;
+  border: 1.5px solid #ddd;
+  border-radius: 8px;
   cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.2s;
+}
+.btn-logout:hover { border-color: #c0392b; color: #c0392b; }
+
+.btn-nav-login {
+  text-decoration: none;
+  color: #555;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.btn-nav-login:hover { color: #1a1a1a; }
+
+.btn-nav-signup {
+  text-decoration: none;
+  background: #1a1a1a;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  padding: 8px 18px;
+  border-radius: 8px;
   transition: background 0.2s;
 }
+.btn-nav-signup:hover { background: #c2185b; }
 
-.navbar-signup:hover {
-  background: #333;
+@media (max-width: 600px) {
+  .navbar { padding: 0 16px; }
+  .navbar-links { display: none; }
 }

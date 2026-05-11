@@ -1,62 +1,63 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
-from models import Product, User
+from flask import Blueprint, request, jsonify, session
+from models import db, Product
 
 products_bp = Blueprint('products', __name__)
+
+def require_admin():
+    if session.get('role') != 'admin':
+        return jsonify({'error': 'Admin access required'}), 403
+    return None
 
 @products_bp.route('/', methods=['GET'])
 def get_products():
     category = request.args.get('category')
-    query = Product.query.filter_by(available=True)
+    query = Product.query
     if category:
         query = query.filter_by(category=category)
-    return jsonify([p.to_dict() for p in query.all()]), 200
+    products = query.filter_by(available=True).all()
+    return jsonify({'products': [p.to_dict() for p in products]}), 200
 
-@products_bp.route('/<int:product_id>', methods=['GET'])
-def get_product(product_id):
-    product = Product.query.get_or_404(product_id)
-    return jsonify(product.to_dict()), 200
+@products_bp.route('/all', methods=['GET'])
+def get_all_products():
+    err = require_admin()
+    if err: return err
+    products = Product.query.all()
+    return jsonify({'products': [p.to_dict() for p in products]}), 200
 
 @products_bp.route('/', methods=['POST'])
-@jwt_required()
 def create_product():
-    user = User.query.get(get_jwt_identity())
-    if not user or not user.is_admin:
-        return jsonify({'error': 'Admin access required'}), 403
+    err = require_admin()
+    if err: return err
     data = request.get_json()
     product = Product(
         name=data['name'],
         description=data.get('description', ''),
         price=data['price'],
-        category=data.get('category', 'other'),
-        image_url=data.get('image_url', '')
+        category=data.get('category', 'Other'),
+        image_url=data.get('image_url', ''),
+        available=data.get('available', True)
     )
     db.session.add(product)
     db.session.commit()
-    return jsonify(product.to_dict()), 201
+    return jsonify({'product': product.to_dict()}), 201
 
 @products_bp.route('/<int:product_id>', methods=['PUT'])
-@jwt_required()
 def update_product(product_id):
-    user = User.query.get(get_jwt_identity())
-    if not user or not user.is_admin:
-        return jsonify({'error': 'Admin access required'}), 403
+    err = require_admin()
+    if err: return err
     product = Product.query.get_or_404(product_id)
     data = request.get_json()
-    for field in ('name', 'description', 'price', 'category', 'image_url', 'available'):
+    for field in ['name', 'description', 'price', 'category', 'image_url', 'available']:
         if field in data:
             setattr(product, field, data[field])
     db.session.commit()
-    return jsonify(product.to_dict()), 200
+    return jsonify({'product': product.to_dict()}), 200
 
 @products_bp.route('/<int:product_id>', methods=['DELETE'])
-@jwt_required()
 def delete_product(product_id):
-    user = User.query.get(get_jwt_identity())
-    if not user or not user.is_admin:
-        return jsonify({'error': 'Admin access required'}), 403
+    err = require_admin()
+    if err: return err
     product = Product.query.get_or_404(product_id)
-    product.available = False
+    db.session.delete(product)
     db.session.commit()
-    return jsonify({'message': 'Product removed'}), 200
+    return jsonify({'message': 'Product deleted'}), 200

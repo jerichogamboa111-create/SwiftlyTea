@@ -1,46 +1,40 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_jwt_extended import JWTManager
 from flask_cors import CORS
-from dotenv import load_dotenv
-import os
+from models import db
+from routes.auth import auth_bp
+from routes.products import products_bp
+from routes.orders import orders_bp
+from routes.users import users_bp
 
-load_dotenv()
+app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your-secret-key-change-in-production'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///restaurant.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy()
-jwt = JWTManager()
+CORS(app, origins=['http://localhost:5173'], supports_credentials=True)
 
-def create_app():
-    app = Flask(__name__)
+db.init_app(app)
 
-    # Config
-    app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("DATABASE_URL", "sqlite:///swiftlytea.db")
-    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "change-this-secret")
+app.register_blueprint(auth_bp, url_prefix='/api/auth')
+app.register_blueprint(products_bp, url_prefix='/api/products')
+app.register_blueprint(orders_bp, url_prefix='/api/orders')
+app.register_blueprint(users_bp, url_prefix='/api/users')
 
-    # Extensions
-    CORS(app, origins=["http://localhost:5173"])  # Vite default port
-    db.init_app(app)
-    jwt.init_app(app)
+with app.app_context():
+    db.create_all()
+    # Seed admin user if not exists
+    from models import User
+    from werkzeug.security import generate_password_hash
+    if not User.query.filter_by(username='admin').first():
+        admin = User(
+            username='admin',
+            email='admin@restaurant.com',
+            password=generate_password_hash('admin123'),
+            role='admin'
+        )
+        db.session.add(admin)
+        db.session.commit()
+        print("Admin user created: username=admin, password=admin123")
 
-    # Register routes
-    from routes.auth import auth_bp
-    from routes.orders import orders_bp
-    from routes.products import products_bp
-    from routes.users import users_bp
-
-    app.register_blueprint(auth_bp, url_prefix="/api/auth")
-    app.register_blueprint(orders_bp, url_prefix="/api/orders")
-    app.register_blueprint(products_bp, url_prefix="/api/products")
-    app.register_blueprint(users_bp, url_prefix="/api/users")
-
-    # Create tables on first run
-    with app.app_context():
-        db.create_all()
-
-    return app
-
-
-if __name__ == "__main__":
-    app = create_app()
+if __name__ == '__main__':
     app.run(debug=True, port=5000)

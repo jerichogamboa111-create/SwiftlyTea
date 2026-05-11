@@ -1,58 +1,87 @@
-from flask import Blueprint, request, jsonify
-from flask_jwt_extended import jwt_required, get_jwt_identity
-from app import db
-from models import Order, OrderItem, Product, User
+from flask import Blueprint, request, jsonify, session
+from models import db, Order, OrderItem, Product
 
 orders_bp = Blueprint('orders', __name__)
 
+def require_login():
+    if not session.get('user_id'):
+        return jsonify({'error': 'Login required'}), 401
+    return None
+
 @orders_bp.route('/', methods=['POST'])
-@jwt_required()
-def create_order():
-    user_id = get_jwt_identity()
+def place_order():
+    err = require_login()
+    if err: return err
+
     data = request.get_json()
     items = data.get('items', [])
+    notes = data.get('notes', '')
+
     if not items:
-        return jsonify({'error': 'Order must have at least one item'}), 400
+        return jsonify({'error': 'Cart is empty'}), 400
+
     total = 0
     order_items = []
     for item in items:
         product = Product.query.get(item['product_id'])
         if not product or not product.available:
             return jsonify({'error': f'Product {item["product_id"]} not available'}), 400
-        total += product.price * item['quantity']
+        subtotal = product.price * item['quantity']
+        total += subtotal
         order_items.append(OrderItem(
             product_id=product.id,
             quantity=item['quantity'],
-            price=product.price
+            unit_price=product.price
         ))
-    order = Order(user_id=user_id, total=total)
+
+    order = Order(
+        user_id=session['user_id'],
+        total=total,
+        notes=notes
+    )
     db.session.add(order)
     db.session.flush()
+
     for oi in order_items:
         oi.order_id = order.id
         db.session.add(oi)
-    db.session.commit()
-    return jsonify(order.to_dict()), 201
 
-@orders_bp.route('/', methods=['GET'])
-@jwt_required()
-def get_orders():
-    user_id = get_jwt_identity()
-    user = User.query.get(user_id)
-    if user and user.is_admin:
-        orders = Order.query.order_by(Order.created_at.desc()).all()
-    else:
-        orders = Order.query.filter_by(user_id=user_id).order_by(Order.created_at.desc()).all()
-    return jsonify([o.to_dict() for o in orders]), 200
+    db.session.commit()
+    return jsonify({'order': order.to_dict()}), 201
+
+@orders_bp.route('/my', methods=['GET'])
+def my_orders():
+    err = require_login()
+    if err: return err
+    orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.created_at.desc()).all()
+    return jsonify({'orders': [o.to_dict() for o in orders]}), 200
+
+@orders_bp.route('/all', methods=['GET'])
+def all_orders():
+    if session.get('role') != 'admin':
+        return jsonify({'error': 'Admin required'}), 403
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    return jsonify({'orders': [o.to_dict() for o in orders]}), 200
 
 @orders_bp.route('/<int:order_id>/status', methods=['PUT'])
-@jwt_required()
 def update_status(order_id):
-    user = User.query.get(get_jwt_identity())
-    if not user or not user.is_admin:
-        return jsonify({'error': 'Admin access required'}), 403
+    if session.get('role') != 'admin':
+        return jsonify({'error': 'Admin required'}), 403
     order = Order.query.get_or_404(order_id)
     data = request.get_json()
-    order.status = data.get('status', order.status)
+    valid = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled']
+    status = data.get('status')
+    if status not in valid:
+        return jsonify({'error': 'Invalid status'}), 400
+    order.status = status
     db.session.commit()
-    return jsonify(order.to_dict()), 200
+    return jsonify({'order': order.to_dict()}), 200
+
+@orders_bp.route('/<int:order_id>', methods=['DELETE'])
+def delete_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    for item in order.items:
+        db.session.delete(item)
+    db.session.delete(order)
+    db.session.commit()
+    return jsonify({'message': 'Order deleted'}), 200
