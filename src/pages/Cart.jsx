@@ -15,6 +15,7 @@ export default function Cart() {
 
   const handleOrder = async () => {
     if (!user) return navigate("/login");
+    if (user.role === "admin") return setError("Admins are not allowed to place orders.");
     setLoading(true);
     setError("");
     try {
@@ -67,6 +68,10 @@ export default function Cart() {
 
       {error && <div className="alert alert-error">{error}</div>}
 
+      {user?.role === "admin" && (
+        <div className="alert alert-error">Admins are not allowed to place orders.</div>
+      )}
+
       <div className="cart-layout">
         <div className="cart-items">
           {items.map((item) => (
@@ -105,7 +110,7 @@ export default function Cart() {
               rows={3}
             />
           </div>
-          <button className="btn-primary btn-place-order" onClick={handleOrder} disabled={loading}>
+          <button className="btn-primary btn-place-order" onClick={handleOrder} disabled={loading || user?.role === "admin"}>
             {loading ? "Placing Order..." : "Place Order"}
           </button>
           <Link to="/" className="btn-secondary">Continue Shopping</Link>

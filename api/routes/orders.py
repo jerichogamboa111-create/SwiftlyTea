@@ -13,6 +13,9 @@ def place_order():
     err = require_login()
     if err: return err
 
+    if session.get('role') == 'admin':
+        return jsonify({'error': 'Admins are not allowed to place orders.'}), 403
+
     data = request.get_json()
     items = data.get('items', [])
     notes = data.get('notes', '')
