@@ -1,21 +1,10 @@
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
-import jwt
-import datetime
 
 auth_bp = Blueprint('auth', __name__)
-SECRET = 'swiftlytea-jwt-secret-2024'
-
-def make_token(user):
-    return jwt.encode({
-        'user_id': user.id,
-        'username': user.username,
-        'role': user.role,
-        'exp': datetime.datetime.utcnow() + datetime.timedelta(days=7)
-    }, SECRET, algorithm='HS256')
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -23,8 +12,11 @@ def login():
     user = User.query.filter_by(username=data.get('username')).first()
     if not user or not check_password_hash(user.password, data.get('password', '')):
         return jsonify({'error': 'Invalid credentials'}), 401
-    token = make_token(user)
-    return jsonify({'user': user.to_dict(), 'token': token}), 200
+    session.permanent = True
+    session['user_id'] = user.id
+    session['role'] = user.role
+    session['username'] = user.username
+    return jsonify({'user': user.to_dict()}), 200
 
 @auth_bp.route('/register', methods=['POST'])
 def register():
@@ -41,21 +33,22 @@ def register():
     )
     db.session.add(user)
     db.session.commit()
-    token = make_token(user)
-    return jsonify({'user': user.to_dict(), 'token': token}), 201
+    session.permanent = True
+    session['user_id'] = user.id
+    session['role'] = user.role
+    session['username'] = user.username
+    return jsonify({'user': user.to_dict()}), 201
 
 @auth_bp.route('/me', methods=['GET'])
 def me():
-    token = request.headers.get('Authorization', '').replace('Bearer ', '')
-    if not token:
+    if not session.get('user_id'):
         return jsonify({'error': 'Not logged in'}), 401
-    try:
-        data = jwt.decode(token, SECRET, algorithms=['HS256'])
-        user = User.query.get(data['user_id'])
-        return jsonify({'user': user.to_dict()}), 200
-    except:
-        return jsonify({'error': 'Invalid token'}), 401
+    user = User.query.get(session['user_id'])
+    if not user:
+        return jsonify({'error': 'User not found'}), 404
+    return jsonify({'user': user.to_dict()}), 200
 
 @auth_bp.route('/logout', methods=['POST'])
 def logout():
+    session.clear()
     return jsonify({'message': 'Logged out'}), 200
