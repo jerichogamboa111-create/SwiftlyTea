@@ -31,27 +31,27 @@ export default function Admin() {
   }, [isAdmin]);
 
   const fetchOrders = () =>
-    fetch("http://localhost:5000/api/orders/all", { credentials: "include" })
+    fetch("/api/orders/all", { credentials: "include" })
       .then((r) => r.json()).then((d) => setOrders(d.orders || []));
 
   const fetchProducts = () =>
-    fetch("http://localhost:5000/api/products/all", { credentials: "include" })
+    fetch("/api/products/all", { credentials: "include" })
       .then((r) => r.json()).then((d) => setProducts(d.products || []));
 
   const fetchUsers = () =>
-    fetch("http://localhost:5000/api/users/", { credentials: "include" })
+    fetch("/api/users/", { credentials: "include" })
       .then((r) => r.json()).then((d) => setUsers(d.users || []));
 
     const deleteOrder = async (id) => {
     if (!confirm("Delete this order?")) return;
-    await fetch(`http://localhost:5000/api/orders/${id}`, {
+    await fetch(`/api/orders/${id}`, {
       method: "DELETE", credentials: "include"
     });
     fetchOrders();
   };
 
   const updateStatus = async (orderId, status) => {
-    await fetch(`http://localhost:5000/api/orders/${orderId}/status`, {
+    await fetch(`/api/orders/${orderId}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -62,7 +62,7 @@ export default function Admin() {
 
   const addProduct = async (e) => {
     e.preventDefault();
-    const res = await fetch("http://localhost:5000/api/products/", {
+    const res = await fetch("/api/products/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -77,7 +77,7 @@ export default function Admin() {
   };
 
   const toggleAvailability = async (product) => {
-    await fetch(`http://localhost:5000/api/products/${product.id}`, {
+    await fetch(`/api/products/${product.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -88,7 +88,7 @@ export default function Admin() {
 
   const deleteProduct = async (id) => {
     if (!confirm("Delete this product?")) return;
-    await fetch(`http://localhost:5000/api/products/${id}`, {
+    await fetch(`/api/products/${id}`, {
       method: "DELETE", credentials: "include"
     });
     fetchProducts();

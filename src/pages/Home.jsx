@@ -22,7 +22,7 @@ export default function Home() {
   const [added, setAdded] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:5000/api/products/", { credentials: "include" })
+    fetch("/api/products/", { credentials: "include" })
       .then((r) => r.ok ? r.json() : null)
       .then((data) => {
         if (data?.products?.length) setProducts(data.products);

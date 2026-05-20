@@ -20,7 +20,7 @@ export default function OrderHistory() {
   useEffect(() => {
     setOrders([]);
     setLoading(true);
-    fetch("http://localhost:5000/api/orders/my", {
+    fetch("/api/orders/my", {
       credentials: "include",
       cache: "no-store",
     })
@@ -31,7 +31,7 @@ export default function OrderHistory() {
 
   const deleteOrder = async (id) => {
     if (!confirm("Delete this order?")) return;
-    await fetch(`http://localhost:5000/api/orders/${id}`, {
+    await fetch(`/api/orders/${id}`, {
       method: "DELETE", credentials: "include",
     });
     setOrders(orders.filter((o) => o.id !== id));
