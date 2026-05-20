@@ -6,7 +6,7 @@ import "../styles/App.css";
 
 export default function Cart() {
   const { items, updateQty, removeItem, clearCart, total } = useCart();
-  const { user } = useAuth();
+  const { user, authHeaders } = useAuth();
   const navigate = useNavigate();
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
@@ -16,14 +16,12 @@ export default function Cart() {
   const handleOrder = async () => {
     if (!user) return navigate("/login");
     if (user.role === "admin") return setError("Admins are not allowed to place orders.");
-    setLoading(true);
-    setError("");
+    setLoading(true); setError("");
     try {
       const res = await fetch("/api/orders/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ items, notes }),
+        headers: authHeaders(),
+        body: JSON.stringify({ items, notes })
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Order failed");
@@ -37,44 +35,35 @@ export default function Cart() {
     }
   };
 
-  if (success) {
-    return (
-      <div className="page-container center-content">
-        <div className="success-box">
-          <div className="success-icon">✅</div>
-          <h2>Order Placed!</h2>
-          <p>Your order has been received. Redirecting to your orders...</p>
-        </div>
+  if (success) return (
+    <div className="page-container center-content">
+      <div className="success-box">
+        <div className="success-icon">✅</div>
+        <h2>Order Placed!</h2>
+        <p>Redirecting to your orders...</p>
       </div>
-    );
-  }
+    </div>
+  );
 
-  if (items.length === 0) {
-    return (
-      <div className="page-container center-content">
-        <div className="empty-state">
-          <div className="empty-icon">🛒</div>
-          <h2>Your cart is empty</h2>
-          <p>Add some items from the menu to get started.</p>
-          <Link to="/" className="btn-primary">Browse Menu</Link>
-        </div>
+  if (items.length === 0) return (
+    <div className="page-container center-content">
+      <div className="empty-state">
+        <div className="empty-icon">🛒</div>
+        <h2>Your cart is empty</h2>
+        <p>Add some items from the menu to get started.</p>
+        <Link to="/" className="btn-primary">Browse Menu</Link>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
     <div className="page-container">
       <h1 className="page-title">Your Cart</h1>
-
       {error && <div className="alert alert-error">{error}</div>}
-
-      {user?.role === "admin" && (
-        <div className="alert alert-error">Admins are not allowed to place orders.</div>
-      )}
-
+      {user?.role === "admin" && <div className="alert alert-error">Admins are not allowed to place orders.</div>}
       <div className="cart-layout">
         <div className="cart-items">
-          {items.map((item) => (
+          {items.map(item => (
             <div key={item.product_id} className="cart-item">
               <div className="cart-item-info">
                 <h4>{item.name}</h4>
@@ -90,25 +79,12 @@ export default function Cart() {
             </div>
           ))}
         </div>
-
         <div className="cart-summary">
           <h3>Order Summary</h3>
-          <div className="summary-line">
-            <span>Subtotal</span>
-            <span>₱{total.toFixed(2)}</span>
-          </div>
-          <div className="summary-line total">
-            <span>Total</span>
-            <span>₱{total.toFixed(2)}</span>
-          </div>
+          <div className="summary-line"><span>Total</span><span>₱{total.toFixed(2)}</span></div>
           <div className="form-group">
             <label>Special Instructions</label>
-            <textarea
-              placeholder="Any notes for the kitchen..."
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-            />
+            <textarea placeholder="Any notes..." value={notes} onChange={e => setNotes(e.target.value)} rows={3} />
           </div>
           <button className="btn-primary btn-place-order" onClick={handleOrder} disabled={loading || user?.role === "admin"}>
             {loading ? "Placing Order..." : "Place Order"}

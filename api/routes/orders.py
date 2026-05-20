@@ -1,28 +1,32 @@
-from flask import Blueprint, request, jsonify, session
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+from flask import Blueprint, request, jsonify
 from models import db, Order, OrderItem, Product
+import jwt
 
 orders_bp = Blueprint('orders', __name__)
+SECRET = 'swiftlytea-jwt-secret-2024'
 
-def require_login():
-    if not session.get('user_id'):
-        return jsonify({'error': 'Login required'}), 401
-    return None
+def get_token_data(req):
+    token = req.headers.get('Authorization', '').replace('Bearer ', '')
+    if not token:
+        return None
+    try:
+        return jwt.decode(token, SECRET, algorithms=['HS256'])
+    except:
+        return None
 
 @orders_bp.route('/', methods=['POST'])
 def place_order():
-    err = require_login()
-    if err: return err
-
-    if session.get('role') == 'admin':
-        return jsonify({'error': 'Admins are not allowed to place orders.'}), 403
-
+    td = get_token_data(request)
+    if not td:
+        return jsonify({'error': 'Login required'}), 401
+    if td.get('role') == 'admin':
+        return jsonify({'error': 'Admins cannot place orders'}), 403
     data = request.get_json()
     items = data.get('items', [])
-    notes = data.get('notes', '')
-
     if not items:
         return jsonify({'error': 'Cart is empty'}), 400
-
     total = 0
     order_items = []
     for item in items:
@@ -36,52 +40,50 @@ def place_order():
             quantity=item['quantity'],
             unit_price=product.price
         ))
-
-    order = Order(
-        user_id=session['user_id'],
-        total=total,
-        notes=notes
-    )
+    order = Order(user_id=td['user_id'], total=total, notes=data.get('notes', ''))
     db.session.add(order)
     db.session.flush()
-
     for oi in order_items:
         oi.order_id = order.id
         db.session.add(oi)
-
     db.session.commit()
     return jsonify({'order': order.to_dict()}), 201
 
 @orders_bp.route('/my', methods=['GET'])
 def my_orders():
-    err = require_login()
-    if err: return err
-    orders = Order.query.filter_by(user_id=session['user_id']).order_by(Order.created_at.desc()).all()
+    td = get_token_data(request)
+    if not td:
+        return jsonify({'error': 'Login required'}), 401
+    orders = Order.query.filter_by(user_id=td['user_id']).order_by(Order.created_at.desc()).all()
     return jsonify({'orders': [o.to_dict() for o in orders]}), 200
 
 @orders_bp.route('/all', methods=['GET'])
 def all_orders():
-    if session.get('role') != 'admin':
+    td = get_token_data(request)
+    if not td or td.get('role') != 'admin':
         return jsonify({'error': 'Admin required'}), 403
     orders = Order.query.order_by(Order.created_at.desc()).all()
     return jsonify({'orders': [o.to_dict() for o in orders]}), 200
 
 @orders_bp.route('/<int:order_id>/status', methods=['PUT'])
 def update_status(order_id):
-    if session.get('role') != 'admin':
+    td = get_token_data(request)
+    if not td or td.get('role') != 'admin':
         return jsonify({'error': 'Admin required'}), 403
     order = Order.query.get_or_404(order_id)
     data = request.get_json()
     valid = ['pending', 'confirmed', 'preparing', 'ready', 'delivered', 'cancelled']
-    status = data.get('status')
-    if status not in valid:
+    if data.get('status') not in valid:
         return jsonify({'error': 'Invalid status'}), 400
-    order.status = status
+    order.status = data['status']
     db.session.commit()
     return jsonify({'order': order.to_dict()}), 200
 
 @orders_bp.route('/<int:order_id>', methods=['DELETE'])
 def delete_order(order_id):
+    td = get_token_data(request)
+    if not td or td.get('role') != 'admin':
+        return jsonify({'error': 'Admin required'}), 403
     order = Order.query.get_or_404(order_id)
     for item in order.items:
         db.session.delete(item)
