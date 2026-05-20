@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
 import "../styles/App.css";
-
 const PLACEHOLDER_PRODUCTS = [
   { id: 1, name: "Grilled Salmon", description: "Atlantic salmon with lemon butter sauce", price: 18.99, category: "Mains", available: true },
   { id: 2, name: "Caesar Salad", description: "Romaine, croutons, parmesan, classic dressing", price: 9.50, category: "Starters", available: true },
@@ -12,7 +11,6 @@ const PLACEHOLDER_PRODUCTS = [
   { id: 5, name: "Pasta Carbonara", description: "Spaghetti, pancetta, egg yolk, pecorino", price: 13.99, category: "Mains", available: true },
   { id: 6, name: "Lemonade", description: "Fresh squeezed with mint", price: 4.50, category: "Drinks", available: true },
 ];
-
 export default function Home() {
   const { user } = useAuth();
   const { addItem, count } = useCart();
@@ -20,7 +18,6 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("All");
   const [added, setAdded] = useState({});
-
   useEffect(() => {
     fetch("/api/products/", { credentials: "include" })
       .then((r) => r.ok ? r.json() : null)
@@ -30,24 +27,21 @@ export default function Home() {
       })
       .catch(() => setProducts(PLACEHOLDER_PRODUCTS));
   }, []);
-
   const categories = ["All", ...new Set(products.map((p) => p.category))];
   const filtered = category === "All" ? products : products.filter((p) => p.category === category);
-
   const handleAdd = (product) => {
     if (!user) return navigate("/login");
+    if (user.role === "admin") return;
     addItem(product);
     setAdded((prev) => ({ ...prev, [product.id]: true }));
     setTimeout(() => setAdded((prev) => ({ ...prev, [product.id]: false })), 1200);
   };
-
   return (
     <div className="page-container">
       <div className="menu-hero">
         <h1>Our Menu</h1>
         <p>Fresh ingredients, bold flavors — order with ease.</p>
       </div>
-
       <div className="category-tabs">
         {categories.map((cat) => (
           <button
@@ -59,7 +53,6 @@ export default function Home() {
           </button>
         ))}
       </div>
-
       <div className="products-grid">
         {filtered.map((product) => (
           <div key={product.id} className="product-card">
@@ -76,18 +69,23 @@ export default function Home() {
               <p>{product.description}</p>
               <div className="product-footer">
                 <span className="product-price">₱{product.price.toFixed(2)}</span>
-                <button
-                  className={`btn-add ${added[product.id] ? "added" : ""}`}
-                  onClick={() => handleAdd(product)}
-                >
-                  {added[product.id] ? "✓ Added" : "+ Add to Cart"}
-                </button>
+                {user?.role === "admin" ? (
+                  <button className="btn-add" disabled style={{ opacity: 0.4, cursor: "not-allowed" }}>
+                    + Add to Cart
+                  </button>
+                ) : (
+                  <button
+                    className={`btn-add ${added[product.id] ? "added" : ""}`}
+                    onClick={() => handleAdd(product)}
+                  >
+                    {added[product.id] ? "✓ Added" : "+ Add to Cart"}
+                  </button>
+                )}
               </div>
             </div>
           </div>
         ))}
       </div>
-
       {count > 0 && (
         <div className="floating-cart" onClick={() => navigate("/cart")}>
           🛒 View Cart ({count} items)
